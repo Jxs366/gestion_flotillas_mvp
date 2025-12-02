@@ -1,0 +1,83 @@
+############################
+#     BACKEND (Node.js)    #
+############################
+backend/node_modules/
+backend/.env
+backend/.env.*
+backend/.DS_Store
+
+# Logs
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-debug.log*
+
+# Build / Cache
+backend/dist/
+backend/build/
+backend/.cache/
+backend/.tmp/
+
+# Clerk (archivos sensibles)
+backend/.clerk/
+backend/clerkSecretKey.txt
+backend/clerkPublishableKey.txt
+
+# Ngrok
+backend/.ngrok2/
+backend/ngrok.log
+
+
+############################
+#   FRONTEND (Expo/React)  #
+############################
+frontend/node_modules/
+frontend/.expo/
+frontend/.env
+frontend/.env.*
+frontend/.DS_Store
+frontend/.expo-shared/
+
+# Native debug folders
+frontend/android/
+frontend/ios/
+
+# Metro / Cache
+frontend/.bundle/
+frontend/.cache/
+frontend/.metro/
+frontend/.tmp/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+
+############################
+#     GENERAL / ROOT       #
+############################
+
+# Env files
+.env
+.env.*
+*.env
+*.env.*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Misc
+*.log
