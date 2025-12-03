@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -6,58 +6,66 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native"
-import { useSignUp } from "@clerk/clerk-expo"
-import { Link, useRouter } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
+} from "react-native";
+import { useSignUp } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
-  const { isLoaded, signUp, setActive } = useSignUp()
-  const router = useRouter()
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [pendingVerification, setPendingVerification] = React.useState(false)
-  const [code, setCode] = React.useState("")
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [fullName, setFullName] = React.useState("");
+  const [emailAddress, setEmailAddress] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [pendingVerification, setPendingVerification] = React.useState(false);
+  const [code, setCode] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const onSignUpPress = async () => {
-    if (!isLoaded || isSubmitting) return
+    if (!isLoaded || isSubmitting) return;
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
+
+      const nameParts = fullName.trim().split(" ");
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ") || "";
+
       await signUp.create({
         emailAddress,
         password,
-      })
+        firstName,
+        lastName,
+      });
 
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
-      setPendingVerification(true)
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      setPendingVerification(true);
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2))
+      console.error(JSON.stringify(err, null, 2));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const onVerifyPress = async () => {
-    if (!isLoaded || !code) return
+    if (!isLoaded || !code) return;
 
     try {
       const signUpAttempt = await signUp.attemptEmailAddressVerification({
         code,
-      })
+      });
 
       if (signUpAttempt.status === "complete") {
-        await setActive({ session: signUpAttempt.createdSessionId })
-        router.replace("/")
+        await setActive({ session: signUpAttempt.createdSessionId });
+        router.replace("/");
       } else {
-        console.error(JSON.stringify(signUpAttempt, null, 2))
+        console.error(JSON.stringify(signUpAttempt, null, 2));
       }
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2))
+      console.error(JSON.stringify(err, null, 2));
     }
-  }
+  };
 
   if (pendingVerification) {
     return (
@@ -93,7 +101,7 @@ export default function SignUpScreen() {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
@@ -112,7 +120,19 @@ export default function SignUpScreen() {
           <Text className="mt-3 text-white/70">
             Registra tus datos para mantener el control total de tus vehículos.
           </Text>
-
+          <View>
+            <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+              Nombre Completo
+            </Text>
+            <TextInput
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="Ej. Juan Pérez"
+              placeholderTextColor="#94a3b8"
+              autoCapitalize="words" // Capitaliza cada palabra
+              className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+            />
+          </View>
           <View className="mt-10 gap-6">
             <View>
               <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
@@ -160,12 +180,14 @@ export default function SignUpScreen() {
             <Text className="text-white/70">¿Ya tienes cuenta?</Text>
             <Link href="/(auth)/sign-in" asChild>
               <TouchableOpacity>
-                <Text className="font-semibold text-emerald-400">Inicia sesión</Text>
+                <Text className="font-semibold text-emerald-400">
+                  Inicia sesión
+                </Text>
               </TouchableOpacity>
             </Link>
           </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
+  );
 }

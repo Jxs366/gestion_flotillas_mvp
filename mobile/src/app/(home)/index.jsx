@@ -22,9 +22,6 @@ export default function Page() {
             <Text className="mt-2 text-3xl font-semibold text-white">
               {user?.firstName || "Conductor"}
             </Text>
-            <Text className="mt-2 text-white/70">
-              {user?.emailAddresses?.[0]?.emailAddress}
-            </Text>
             <Text className="mt-6 text-base text-white/80">
               Gestiona tu flota, registra nuevos vehículos y mantén tus datos
               al día desde una sola vista.

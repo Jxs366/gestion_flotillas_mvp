@@ -32,8 +32,8 @@ export default function CreateVehicleScreen() {
       if (!token) {
         throw new Error("No hay sesión activa. Por favor, inicia sesión nuevamente.")
       }
-
-      const res = await fetch("http://192.168.0.14:4000/api/vehicles", {
+      
+      const res = await fetch("https://raptureless-iridescently-monte.ngrok-free.dev/api/vehicles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
