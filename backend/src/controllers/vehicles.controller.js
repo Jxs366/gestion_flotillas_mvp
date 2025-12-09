@@ -12,15 +12,26 @@ export const listVehicles = async (req, res) => {
 
 export const addVehicle = async (req, res) => {
   try {
-    const { plate, model } = req.body;
+    // 1. Extraer TODOS los campos del body
+    const { plate, model, vin, make, year, current_odometer } = req.body;
     
-    if (!plate) {
-      return res.status(400).json({ message: 'La placa es obligatoria' });
+    // 2. Validar obligatorios
+    if (!plate || !model || !vin || !make) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios (Vin, Placa, Marca, Modelo)' });
     }
 
-    const newVehicle = await vehicleModel.create({ plate, model });
+    // 3. Llamar al modelo pasando el objeto completo
+    // Nota: Asegúrate de que tu función vehicleModel.create acepte estos parámetros
+    const newVehicle = await vehicleModel.create({ 
+        plate, model, vin, make, year, current_odometer 
+    });
+    
     res.status(201).json(newVehicle);
   } catch (error) {
+    // Manejo de errores (ej. llave duplicada en VIN o Placa)
+    if (error.code === '23505') { 
+        return res.status(400).json({ message: 'El VIN o la Placa ya están registrados.' });
+    }
     res.status(500).json({ message: error.message });
   }
 };

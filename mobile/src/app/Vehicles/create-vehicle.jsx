@@ -15,13 +15,22 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function CreateVehicleScreen() {
   const { getToken } = useAuth()
-  const [plate, setPlate] = useState("")
+  
+  // 1. ESTADOS PARA TODOS LOS CAMPOS
+  const [vin, setVin] = useState("")
+  const [make, setMake] = useState("") // Marca
   const [model, setModel] = useState("")
+  const [year, setYear] = useState("")
+  const [plate, setPlate] = useState("")
+  const [odometer, setOdometer] = useState("")
+
   const [isSaving, setIsSaving] = useState(false)
 
   async function saveVehicle() {
-    if (!plate || !model) {
-      Alert.alert("Campos incompletos", "Ingresa el modelo y la placa.")
+    // 2. VALIDACIÓN DE CAMPOS OBLIGATORIOS
+    // Según tu DB: vin, plate, make, model son NOT NULL.
+    if (!vin || !make || !model || !plate) {
+      Alert.alert("Campos incompletos", "Por favor ingresa al menos VIN, Marca, Modelo y Placa.")
       return
     }
 
@@ -32,20 +41,25 @@ export default function CreateVehicleScreen() {
       if (!token) {
         throw new Error("No hay sesión activa. Por favor, inicia sesión nuevamente.")
       }
-      
+
+      // NOTA: Asegúrate de que esta URL sea la correcta de tu Ngrok actual
       const res = await fetch("https://raptureless-iridescently-monte.ngrok-free.dev/api/vehicles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        // 3. ENVIAR TODOS LOS DATOS
         body: JSON.stringify({
+          vin,
           plate,
+          make,
           model,
+          year,
+          current_odometer: parseInt(odometer) || 0, // Convertir a número, default 0
         }),
       })
 
-      // Verificar el Content-Type antes de parsear
       const contentType = res.headers.get("content-type")
       if (!contentType || !contentType.includes("application/json")) {
         if (res.status === 401) {
@@ -56,12 +70,19 @@ export default function CreateVehicleScreen() {
 
       if (!res.ok) {
         const errorData = await res.json()
-        throw new Error(errorData.error || "No se pudo guardar el vehículo")
+        throw new Error(errorData.message || errorData.error || "No se pudo guardar el vehículo")
       }
 
       const data = await res.json()
-      setPlate("")
+      
+      // Limpiar formulario
+      setVin("")
+      setMake("")
       setModel("")
+      setYear("")
+      setPlate("")
+      setOdometer("")
+      
       Alert.alert("Vehículo registrado", "Se guardó correctamente 🎉")
     } catch (error) {
       Alert.alert("Error", error.message ?? "Intenta nuevamente")
@@ -89,36 +110,100 @@ export default function CreateVehicleScreen() {
               Agrega un vehículo
             </Text>
             <Text className="mt-3 text-white/70">
-              Completa los campos para incorporarlo a tu control vehicular.
+              Ingresa los datos técnicos de la unidad.
             </Text>
           </View>
 
           <View className="mt-10 gap-6">
+            
+            {/* --- VIN (Obligatorio) --- */}
             <View>
               <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
-                Modelo
+                VIN (Número de Serie) *
               </Text>
               <TextInput
-                value={model}
-                onChangeText={setModel}
-                placeholder="Ej. Toyota Hilux 2023"
+                value={vin}
+                onChangeText={(text) => setVin(text.toUpperCase())}
+                placeholder="Ej. 1HGCM826..."
+                placeholderTextColor="#94a3b8"
+                autoCapitalize="characters"
+                className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+              />
+            </View>
+
+            {/* --- MARCA y MODELO (Fila) --- */}
+            <View className="flex-row gap-4">
+                <View className="flex-1">
+                <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+                    Marca *
+                </Text>
+                <TextInput
+                    value={make}
+                    onChangeText={setMake}
+                    placeholder="Toyota"
+                    placeholderTextColor="#94a3b8"
+                    className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+                />
+                </View>
+                <View className="flex-1">
+                <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+                    Modelo *
+                </Text>
+                <TextInput
+                    value={model}
+                    onChangeText={setModel}
+                    placeholder="Hilux"
+                    placeholderTextColor="#94a3b8"
+                    className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+                />
+                </View>
+            </View>
+
+            {/* --- AÑO y PLACA (Fila) --- */}
+            <View className="flex-row gap-4">
+                <View className="flex-1">
+                <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+                    Año
+                </Text>
+                <TextInput
+                    value={year}
+                    onChangeText={setYear}
+                    placeholder="2023"
+                    keyboardType="numeric"
+                    placeholderTextColor="#94a3b8"
+                    className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+                />
+                </View>
+                <View className="flex-1">
+                <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+                    Placa *
+                </Text>
+                <TextInput
+                    value={plate}
+                    onChangeText={(value) => setPlate(value.toUpperCase())}
+                    autoCapitalize="characters"
+                    placeholder="ABC1234"
+                    placeholderTextColor="#94a3b8"
+                    className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white tracking-widest"
+                />
+                </View>
+            </View>
+
+             {/* --- ODOMETRO --- */}
+             <View>
+              <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+                Kilometraje Inicial
+              </Text>
+              <TextInput
+                value={odometer}
+                onChangeText={setOdometer}
+                keyboardType="numeric"
+                placeholder="0"
                 placeholderTextColor="#94a3b8"
                 className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
               />
             </View>
-            <View>
-              <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
-                Placa
-              </Text>
-              <TextInput
-                value={plate}
-                onChangeText={(value) => setPlate(value.toUpperCase())}
-                autoCapitalize="characters"
-                placeholder="ABC123"
-                placeholderTextColor="#94a3b8"
-                className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white tracking-[0.3em]"
-              />
-            </View>
+
           </View>
 
           <View className="mt-10 gap-4">

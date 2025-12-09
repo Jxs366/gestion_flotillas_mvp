@@ -1,11 +1,11 @@
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo"
-import { Link } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { ScrollView, Text, TouchableOpacity, View } from "react-native"
-import { SignOutButton } from "../components/SignOutButton"
+import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
+import { Link } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SignOutButton } from "../components/SignOutButton";
 
 export default function Page() {
-  const { user } = useUser()
+  const { user } = useUser();
 
   return (
     <SafeAreaView className="flex-1 bg-slate-950">
@@ -23,23 +23,30 @@ export default function Page() {
               {user?.firstName || "Conductor"}
             </Text>
             <Text className="mt-6 text-base text-white/80">
-              Gestiona tu flota, registra nuevos vehículos y mantén tus datos
-              al día desde una sola vista.
+              Gestiona tu flota, registra nuevos vehículos y mantén tus datos al
+              día desde una sola vista.
             </Text>
           </View>
 
           <View className="mt-10 gap-4">
+            <Link href="/Areas" push asChild>
+              <TouchableOpacity className="w-full rounded-2xl bg-sky-600 py-4 shadow-lg shadow-sky-500/30">
+                <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
+                  Ver Áreas
+                </Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="/Users" push asChild>
+              <TouchableOpacity className="w-full rounded-2xl bg-purple-500/30 py-4 shadow-lg shadow-purple-500/30">
+                <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
+                  Ver Usuarios
+                </Text>
+              </TouchableOpacity>
+            </Link>
             <Link href="/Vehicles" push asChild>
               <TouchableOpacity className="w-full rounded-2xl bg-emerald-500 py-4 shadow-lg shadow-emerald-500/30">
                 <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
                   Ver Vehículos
-                </Text>
-              </TouchableOpacity>
-            </Link>
-            <Link href="/Vehicles/create-vehicle" push asChild>
-              <TouchableOpacity className="w-full rounded-2xl border border-white/15 bg-transparent py-4">
-                <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
-                  Registrar Vehículo
                 </Text>
               </TouchableOpacity>
             </Link>
@@ -76,5 +83,5 @@ export default function Page() {
         </SignedOut>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

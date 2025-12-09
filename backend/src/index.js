@@ -7,6 +7,8 @@ import { clerkMiddleware } from '@clerk/express';
 // Si vehicles.routes usa 'module.exports', tendrás que cambiarlo a 'export default'
 import vehiclesRoutes from './routes/vehicles.routes.js'; 
 import webhookRoutes from './routes/webhook.routes.js';
+import usersRoutes from './routes/users.routes.js';
+import areasRoutes from './routes/areas.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -25,6 +27,8 @@ app.use(clerkMiddleware());
 
 // --- RUTAS DE LA APP ---
 app.use('/api/vehicles', vehiclesRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/areas', areasRoutes);
 
 app.listen(PORT, () => 
   console.log(`🚗 Servidor corriendo en http://localhost:${PORT}`)
