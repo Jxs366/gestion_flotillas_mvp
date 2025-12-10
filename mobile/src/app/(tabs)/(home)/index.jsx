@@ -1,7 +1,8 @@
 import { useUser } from "@clerk/clerk-expo";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View, Image } from "react-native";
 import { SignOutButton } from "../../components/SignOutButton"; // Ajusta la ruta si es necesario
+
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -22,7 +23,6 @@ export default function Dashboard() {
             Selecciona una opción en el menú inferior para gestionar tu flota.
           </Text>
         </View>
-
         {/* Aquí puedes poner métricas o resumenes rápidos en lugar de botones de navegación */}
         
         <SignOutButton />

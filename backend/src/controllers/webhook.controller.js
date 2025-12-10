@@ -1,5 +1,6 @@
 import { Webhook } from 'svix';
-import { syncNewUser } from '../services/user.service.js'; // Llamamos al servicio
+// 1. IMPORTANTE: Agregamos deleteUser a la importación
+import { syncNewUser, deleteUser } from '../services/user.service.js'; 
 
 export const handleClerkWebhook = async (req, res) => {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -23,6 +24,9 @@ export const handleClerkWebhook = async (req, res) => {
   let evt;
 
   try {
+    // Nota: wh.verify necesita el payload como string (req.body raw), 
+    // asegúrate de que tu configuración de express no lo haya parseado a JSON antes de este punto
+    // o usa una librería como body-parser para obtener el raw body si es necesario.
     evt = wh.verify(req.body, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
@@ -35,13 +39,20 @@ export const handleClerkWebhook = async (req, res) => {
 
   // 3. Delegar al Servicio según el evento
   const eventType = evt.type;
+  console.log(`🔔 Evento recibido: ${eventType}`);
 
   try {
     if (eventType === 'user.created') {
-      await syncNewUser(evt.data); // Pasamos solo los datos necesarios
+      await syncNewUser(evt.data);
+      
+    } else if (eventType === 'user.deleted') {
+      // 2. NUEVO: Manejo de eliminación
+      await deleteUser(evt.data);
     }
-    // Aquí podrías agregar más 'else if' para 'user.deleted', etc.
     
+    // Si quisieras manejar actualizaciones:
+    // else if (eventType === 'user.updated') { ... }
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error procesando webhook:', error);

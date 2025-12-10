@@ -10,6 +10,8 @@ import {
   View,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+// Importamos Ionicons para el signo de más
+import { Ionicons } from "@expo/vector-icons"
 
 export default function UsersScreen() {
   const [users, setUsers] = useState([])
@@ -28,7 +30,7 @@ export default function UsersScreen() {
         return
       }
       
-      // Asegúrate de que tu backend tenga la ruta GET /api/users creada
+      // Asegúrate de que tu URL de ngrok sea la actual
       const res = await fetch("https://raptureless-iridescently-monte.ngrok-free.dev/api/users", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,11 +73,11 @@ export default function UsersScreen() {
   }, [])
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-950">
+    <SafeAreaView className="flex-1 bg-slate-950 relative">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="px-6 pb-20 pt-12"
+        contentContainerClassName="px-6 pb-32 pt-12" // Aumenté el padding inferior (pb-32) para que el botón no tape el último elemento
         refreshControl={
           <RefreshControl
             tintColor="#fff"
@@ -141,7 +143,6 @@ export default function UsersScreen() {
                     </Text>
                   </View>
                   
-                  {/* Opcional: Mostrar últimos caracteres del ID para referencia */}
                   <View className="items-end pl-2">
                     <Text className="text-xs uppercase tracking-wide text-white/40">
                       ID
@@ -155,19 +156,19 @@ export default function UsersScreen() {
             ))}
           </View>
         )}
-
-        <View className="mt-10 gap-4">
-          {/* Eliminé el botón de "Registrar" porque eso se hace vía Webhook/Signup */}
-          
-          <Link href="/(home)/" replace asChild>
-            <TouchableOpacity className="w-full rounded-2xl border border-white/15 bg-transparent py-4">
-              <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
-                Volver a inicio
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
       </ScrollView>
+
+      {/* --- BOTÓN FLOTANTE (FAB) --- */}
+      {/* Está fuera del ScrollView pero dentro del SafeAreaView */}
+      <Link href="/(tabs)/Users/register" asChild>
+        <TouchableOpacity 
+          activeOpacity={0.8}
+          className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center rounded-full bg-emerald-500 shadow-2xl shadow-emerald-500/50 z-50"
+        >
+          <Ionicons name="add" size={32} color="white" />
+        </TouchableOpacity>
+      </Link>
+
     </SafeAreaView>
   )
 }
