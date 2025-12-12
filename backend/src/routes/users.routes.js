@@ -1,15 +1,13 @@
 import { Router } from 'express';
-// 1. Importamos la nueva función inviteUser
-import { listUsers, inviteUser } from '../controllers/users.controller.js';
+import { listUsers, inviteUser, getUserById, updateStatus } from '../controllers/users.controller.js';
 import { requireAuth } from '@clerk/express';
 
 const router = Router();
 
-// Rutas
-router.get('/', requireAuth(), listUsers); 
+router.get('/', requireAuth(), listUsers);
+router.post('/invite', requireAuth(), inviteUser);
 
-// 2. Agregamos la ruta POST para invitar
-// requireAuth() protege para que solo usuarios logueados (Admins) puedan invitar
-router.post('/invite', requireAuth(), inviteUser); 
+router.get('/:id', requireAuth(), getUserById);
+router.patch('/:id/status', requireAuth(), updateStatus);
 
 export default router;

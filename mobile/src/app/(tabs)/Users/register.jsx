@@ -35,7 +35,13 @@ export default function RegisterUserScreen() {
       setIsSubmitting(true);
       const token = await getToken();
 
+<<<<<<< HEAD
       const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/users/invite`;
+=======
+
+      // ⚠️ IMPORTANTE: REEMPLAZA CON TU URL DE NGROK ACTUAL
+      const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/users/invite`;
+>>>>>>> guillermo
 
       const response = await fetch(API_URL, {
         method: "POST",

@@ -1,58 +1,93 @@
 import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; // Asegúrate de tener iconos instalados
+import { Ionicons } from "@expo/vector-icons";
+import { useUserStatusCheck } from "../../hooks/useUserStatus"; // 👈 1. Importamos el hook de seguridad
 
 export default function TabsLayout() {
+  
+  // 👈 2. Ejecutamos el hook aquí.
+  // Esto verificará silenciosamente el estado del usuario.
+  // Si está "inactive", lo mandará a /access-denied automáticamente.
+  useUserStatusCheck();
+
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: "#2f95dc" }}>
+    <Tabs
+      screenOptions={{
+        // 3. Actualizamos colores para coincidir con el diseño "Light Mode" (Naranja/Blanco)
+        tabBarActiveTintColor: "#ff6600", // Naranja
+        tabBarInactiveTintColor: "#9ca3af", // Gris suave
+        tabBarStyle: {
+          backgroundColor: "#ffffff",
+          borderTopWidth: 1,
+          borderTopColor: "#f3f4f6",
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontWeight: "600",
+          fontSize: 10,
+        },
+        headerShown: false, // Ocultamos el header por defecto en todos los tabs
+      }}
+    >
+      {/* Tab 1: Inicio */}
       <Tabs.Screen
-        name="(home)" // Coincide con la carpeta 'home'
+        name="(home)" // Coincide con la carpeta '(home)'
         options={{
           title: "Inicio",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? "home" : "home-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
-          headerShown: false, // Opcional: Oculta el header superior si ya tienes uno en la pantalla
         }}
       />
 
       {/* Tab 2: Vehículos */}
       <Tabs.Screen
-        name="Vehicles" // Coincide con la carpeta 'vehicles'
+        name="Vehicles" // Coincide con la carpeta 'Vehicles'
         options={{
           title: "Vehículos",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="car" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? "car" : "car-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
-          headerShown: false,
         }}
       />
 
       {/* Tab 3: Áreas */}
       <Tabs.Screen
-        name="Areas" // Coincide con la carpeta 'areas'
+        name="Areas" // Coincide con la carpeta 'Areas'
         options={{
           title: "Áreas",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="map" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? "map" : "map-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
-          headerShown: false,
         }}
       />
 
       {/* Tab 4: Usuarios */}
       <Tabs.Screen
-        name="Users" // Coincide con la carpeta 'users'
+        name="Users" // Coincide con la carpeta 'Users'
         options={{
           title: "Usuarios",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="people" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? "people" : "people-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
-          headerShown: false,
         }}
       />
     </Tabs>
   );
 }
-
-
-

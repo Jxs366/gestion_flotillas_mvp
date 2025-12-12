@@ -1,50 +1,140 @@
-import pool from '../db/connection.js';
-// 1. Importamos el creador del cliente de Clerk
-import { createClerkClient } from '@clerk/backend';
+import pool from "../db/connection.js";
+// Importamos el creador del cliente de Clerk
+import { createClerkClient } from "@clerk/backend";
+import { changeStatus } from "../services/user.service.js";
 
-// 2. Inicializamos el cliente (asegúrate de tener CLERK_SECRET_KEY en tu .env)
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+// Inicializamos el cliente
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY,
+});
 
 export const listUsers = async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM profiles ORDER BY created_at DESC');
+    // Usamos 'AS driver_status' para identificarlo claramente en el frontend
+    const { rows } = await pool.query(`
+      SELECT 
+        profiles.*, 
+        drivers.status AS driver_status 
+      FROM profiles
+      LEFT JOIN public.drivers AS drivers ON profiles.id = drivers.id
+      ORDER BY profiles.created_at DESC
+    `);
+    
     res.json(rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// 3. NUEVA FUNCIÓN: Invitar usuario
+// Invitar usuario
 export const inviteUser = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, role } = req.body;
 
     if (!email) {
-      return res.status(400).json({ message: 'El email es obligatorio' });
+      return res.status(400).json({ message: "El email es obligatorio" });
     }
+
+    // 2. Validamos el rol por seguridad
+    // Si envían "admin", usamos "admin". Si envían cualquier otra cosa (o nada), forzamos "driver".
+    const roleToAssign = role === "admin" ? "admin" : "driver";
 
     // Crear la invitación en Clerk
     const invitation = await clerkClient.invitations.createInvitation({
       emailAddress: email,
-      // A dónde redirige el correo cuando le dan click (puede ser tu web o un link profundo)
-      // Por ahora pon tu URL de desarrollo o producción
-      redirectUrl: 'https://adjusted-sawfly-23.accounts.dev/sign-up', 
-      ignoreExisting: true, // Si ya fue invitado, no lanza error
+      redirectUrl: "https://adjusted-sawfly-23.accounts.dev/sign-up",
+      ignoreExisting: true,
       publicMetadata: {
-        role: 'driver' // Podemos guardar esto para usarlo luego si quisieras
-      }
+        // 3. USAMOS LA VARIABLE DINÁMICA AQUÍ
+        role: roleToAssign,
+      },
     });
 
-    res.status(200).json({ 
-      message: 'Invitación enviada con éxito', 
-      invitation 
+    res.status(200).json({
+      message: `Invitación enviada exitosamente como ${roleToAssign}`,
+      invitation,
     });
-
   } catch (error) {
     console.error("Error al invitar:", error);
-    // Clerk devuelve errores detallados, los pasamos al frontend
-    res.status(500).json({ 
-      message: error.errors?.[0]?.message || 'Error al crear la invitación' 
+    res.status(500).json({
+      message: error.errors?.[0]?.message || "Error al crear la invitación",
     });
+  }
+};
+
+// Obtener usuario por ID (con detalles de driver)
+export const getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 1. VALIDACIÓN INTELIGENTE
+    // Expresión regular para saber si el ID es un UUID válido (formato 8-4-4-4-12 chars)
+    const isUuid =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        id
+      );
+
+    let whereClause;
+
+    if (isUuid) {
+      // Si es UUID, buscamos en la columna ID (Llave primaria de Postgres)
+      whereClause = "WHERE p.id = $1";
+    } else {
+      // Si NO es UUID (ej. "user_2a..."), buscamos en la columna CLERK_ID
+      whereClause = "WHERE p.clerk_id = $1";
+    }
+
+    const query = `
+      SELECT 
+        p.*, 
+        d.license_number, 
+        d.phone, 
+        d.status as driver_status
+      FROM profiles p
+      LEFT JOIN drivers d ON p.id = d.user_id
+      ${whereClause} 
+    `;
+
+    const { rows } = await pool.query(query, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error obteniendo detalles del usuario" });
+  }
+};
+
+export const updateStatus = async (req, res) => {
+  const { id } = req.params; // UUID del usuario
+  const { status } = req.body; // 'inactive' (para eliminar lógicamente)
+
+  if (!status) {
+    return res.status(400).json({ message: "El campo status es obligatorio" });
+  }
+
+  try {
+    // Llamamos al servicio
+    const driver = await changeStatus(id, status);
+
+    if (!driver) {
+      return res
+        .status(404)
+        .json({
+          message: "Conductor no encontrado o el usuario no es conductor.",
+        });
+    }
+
+    res.json({ message: "Estado actualizado correctamente", driver });
+  } catch (error) {
+    console.error(error);
+    // Si el error viene de nuestra validación de negocio en el servicio
+    if (error.message.includes("Estado inválido")) {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
