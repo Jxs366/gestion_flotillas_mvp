@@ -76,3 +76,17 @@ export const deleteUser = async (clerkData) => {
 
   return deletedUser;
 };
+
+export const changeStatus = async (userId, status) => {
+  // Lógica de Negocio: Validar que el estado sea permitido
+  const validStatuses = ['active', 'inactive', 'suspended'];
+  
+  if (!validStatuses.includes(status)) {
+    throw new Error(`Estado inválido. Permitidos: ${validStatuses.join(', ')}`);
+  }
+
+  // Llamamos al modelo
+  const updatedDriver = await UserModel.updateDriverStatus(userId, status);
+  
+  return updatedDriver;
+};

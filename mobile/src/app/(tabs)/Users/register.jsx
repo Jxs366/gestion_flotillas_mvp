@@ -37,7 +37,7 @@ export default function RegisterUserScreen() {
 
 
       // ⚠️ IMPORTANTE: REEMPLAZA CON TU URL DE NGROK ACTUAL
-      const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/users/invite`;
+      const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/users/invite`;
 
       const response = await fetch(API_URL, {
         method: 'POST',

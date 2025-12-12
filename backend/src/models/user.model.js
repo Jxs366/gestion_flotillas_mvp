@@ -58,8 +58,26 @@ const deleteProfile = async (clerkId) => {
   }
 };
 
+const updateDriverStatus = async (userId, newStatus) => {
+  const query = `
+    UPDATE public.drivers
+    SET status = $1
+    WHERE user_id = $2
+    RETURNING *;
+  `;
+
+  try {
+    const result = await pool.query(query, [newStatus, userId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("❌ Error actualizando estado del conductor:", error.message);
+    throw error;
+  }
+};
+
 export default {
   createProfile,
   createDriverRecord,
-  deleteProfile
+  deleteProfile,
+  updateDriverStatus
 };
