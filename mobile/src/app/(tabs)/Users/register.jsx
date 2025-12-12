@@ -1,3 +1,4 @@
+// app/users/registers.jsx
 import * as React from "react";
 import {
   KeyboardAvoidingView,
@@ -18,13 +19,13 @@ export default function RegisterUserScreen() {
 
   const [emailAddress, setEmailAddress] = React.useState("");
   const [fullName, setFullName] = React.useState("");
-  // Estado para el rol, por defecto 'driver'
   const [selectedRole, setSelectedRole] = React.useState("driver");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+  const ORANGE = "#ff6600";
+
   const onRegisterPress = async () => {
     if (isSubmitting) return;
-
     if (!emailAddress) {
       Alert.alert("Error", "El correo es obligatorio");
       return;
@@ -32,39 +33,36 @@ export default function RegisterUserScreen() {
 
     try {
       setIsSubmitting(true);
-
       const token = await getToken();
 
-
-      // ⚠️ IMPORTANTE: REEMPLAZA CON TU URL DE NGROK ACTUAL
       const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/users/invite`;
 
       const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true", // Header para ngrok
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           email: emailAddress,
-          fullName: fullName, // Enviamos el nombre por si el backend lo quiere guardar en logs
-          role: selectedRole  // Enviamos el rol seleccionado
+          fullName: fullName,
+          role: selectedRole,
         }),
       });
 
-      const data = await response.json(); // Ahora sí esperamos JSON seguro
+      const data = await response.json();
 
       if (response.ok) {
         Alert.alert(
-          "Invitación Enviada", 
-          `Se ha invitado al usuario como ${selectedRole === 'driver' ? 'Conductor' : 'Administrador'}.`,
+          "Invitación Enviada",
+          `Se ha invitado al usuario como ${selectedRole === "driver" ? "Conductor" : "Administrador"
+          }.`,
           [{ text: "Entendido", onPress: () => router.back() }]
         );
       } else {
         Alert.alert("Error", data.message || "No se pudo enviar la invitación");
       }
-
     } catch (err) {
       console.error(err);
       Alert.alert("Error de Conexión", "Revisa tu conexión o la URL del servidor.");
@@ -74,112 +72,120 @@ export default function RegisterUserScreen() {
   };
 
   return (
-    <View className="flex-1 bg-slate-950">
+    <View className="flex-1 bg-white">
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: "padding", android: undefined })}
         className="flex-1"
       >
         <ScrollView className="flex-1 px-6 pt-6">
-          
-          <Text className="mt-2 text-3xl font-semibold text-white">
+          <Text className="mt-2 text-3xl font-semibold text-gray-900">
             Invitar Usuario
           </Text>
-          <Text className="mt-2 text-white/70">
-            Envía una invitación para que el usuario se registre y configure su contraseña.
+
+          <Text className="mt-2 text-gray-600">
+            Envía una invitación para que el usuario se registre.
           </Text>
 
-          {/* Input Nombre */}
+          {/* INPUT NOMBRE */}
           <View className="mt-8">
-            <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
-              Nombre (Referencia)
+            <Text className="text-sm font-medium uppercase text-gray-500">
+              Nombre
             </Text>
             <TextInput
               value={fullName}
               onChangeText={setFullName}
               placeholder="Ej. Juan Pérez"
-              placeholderTextColor="#94a3b8"
-              autoCapitalize="words"
-              className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+              placeholderTextColor="#9ca3af"
+              className="mt-2 w-full rounded-2xl bg-gray-100 border border-gray-300 px-4 py-3 text-base text-gray-900"
             />
           </View>
 
-          {/* Input Email */}
+          {/* INPUT CORREO */}
           <View className="mt-6">
-            <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
+            <Text className="text-sm font-medium uppercase text-gray-500">
               Correo electrónico
             </Text>
             <TextInput
+              value={emailAddress}
+              onChangeText={(t) => setEmailAddress(t.trim())}
+              placeholder="correo@empresa.com"
               autoCapitalize="none"
               keyboardType="email-address"
-              value={emailAddress}
-              placeholder="nombre@empresa.com"
-              placeholderTextColor="#94a3b8"
-              onChangeText={(text) => setEmailAddress(text.trim())}
-              className="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base text-white"
+              placeholderTextColor="#9ca3af"
+              className="mt-2 w-full rounded-2xl bg-gray-100 border border-gray-300 px-4 py-3 text-base text-gray-900"
             />
           </View>
 
           {/* SELECTOR DE ROL */}
           <View className="mt-6">
-            <Text className="text-sm font-medium uppercase tracking-wide text-white/60 mb-3">
+            <Text className="text-sm font-medium uppercase text-gray-500 mb-3">
               Asignar Rol
             </Text>
+
             <View className="flex-row gap-4">
-              {/* Botón Driver */}
-              <TouchableOpacity 
-                onPress={() => setSelectedRole('driver')}
-                activeOpacity={0.8}
-                className={`flex-1 py-4 rounded-xl border ${
-                  selectedRole === 'driver' 
-                    ? 'bg-emerald-500 border-emerald-500' 
-                    : 'border-white/20 bg-white/5'
-                }`}
+              {/* DRIVER */}
+              <TouchableOpacity
+                onPress={() => setSelectedRole("driver")}
+                style={{
+                  backgroundColor:
+                    selectedRole === "driver" ? ORANGE : "#f3f4f6",
+                  borderColor:
+                    selectedRole === "driver" ? ORANGE : "#d1d5db",
+                }}
+                className="flex-1 py-4 rounded-xl border"
               >
-                <Text className={`text-center font-bold text-base ${
-                  selectedRole === 'driver' ? 'text-white' : 'text-white/60'
-                }`}>
+                <Text
+                  className={`text-center font-bold ${selectedRole === "driver"
+                    ? "text-white"
+                    : "text-gray-600"
+                    }`}
+                >
                   Conductor
                 </Text>
               </TouchableOpacity>
 
-              {/* Botón Admin */}
-              <TouchableOpacity 
-                onPress={() => setSelectedRole('admin')}
-                activeOpacity={0.8}
-                className={`flex-1 py-4 rounded-xl border ${
-                  selectedRole === 'admin' 
-                    ? 'bg-purple-600 border-purple-600' 
-                    : 'border-white/20 bg-white/5'
-                }`}
+              {/* ADMIN */}
+              <TouchableOpacity
+                onPress={() => setSelectedRole("admin")}
+                style={{
+                  backgroundColor:
+                    selectedRole === "admin" ? "#7e22ce" : "#f3f4f6",
+                  borderColor:
+                    selectedRole === "admin" ? "#7e22ce" : "#d1d5db",
+                }}
+                className="flex-1 py-4 rounded-xl border"
               >
-                <Text className={`text-center font-bold text-base ${
-                  selectedRole === 'admin' ? 'text-white' : 'text-white/60'
-                }`}>
+                <Text
+                  className={`text-center font-bold ${selectedRole === "admin"
+                    ? "text-white"
+                    : "text-gray-600"
+                    }`}
+                >
                   Admin
                 </Text>
               </TouchableOpacity>
             </View>
-            <Text className="mt-2 text-xs text-white/40 text-center">
-              {selectedRole === 'driver' 
-                ? 'Se creará un registro de conductor en la base de datos.' 
-                : 'El usuario tendrá acceso total al panel.'}
+
+            <Text className="mt-2 text-xs text-gray-500 text-center">
+              {selectedRole === "driver"
+                ? "Se creará un registro de conductor."
+                : "Tendrá acceso total al panel."}
             </Text>
           </View>
 
-          {/* Botón Enviar */}
+          {/* BOTÓN ENVIAR */}
           <TouchableOpacity
             onPress={onRegisterPress}
             disabled={isSubmitting}
-            activeOpacity={0.85}
-            className={`mt-10 w-full rounded-2xl py-4 shadow-lg shadow-emerald-500/30 ${
-              isSubmitting ? "bg-emerald-500/50" : "bg-emerald-500"
-            }`}
+            style={{
+              backgroundColor: isSubmitting ? "#ff660088" : ORANGE,
+            }}
+            className="mt-10 w-full rounded-2xl py-4"
           >
-            <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
+            <Text className="text-center font-semibold text-white">
               {isSubmitting ? "Enviando..." : "Enviar Invitación"}
             </Text>
           </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
