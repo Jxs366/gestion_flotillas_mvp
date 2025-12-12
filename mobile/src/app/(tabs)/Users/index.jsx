@@ -1,6 +1,6 @@
 import { useAuth } from "@clerk/clerk-expo";
-import { Link, router } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useFocusEffect } from "expo-router"; // Importamos useFocusEffect
+import { useCallback, useState } from "react";      // Importamos useCallback
 import {
   ActivityIndicator,
   RefreshControl,
@@ -8,35 +8,26 @@ import {
   Text,
   TouchableOpacity,
   View,
-  StatusBar,
-  LayoutAnimation, // Para animación suave al abrir/cerrar
-  Platform,
-  UIManager
+  StatusBar
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-// Habilitar animaciones en Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
+// Asegúrate de que la ruta a tu componente sea correcta
+import UserCard from "../../components/UserCard"; 
 
 export default function UsersScreen() {
   const [users, setUsers] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Estado para colapsar/expandir inactivos (Estilo WhatsApp)
-  const [showInactive, setShowInactive] = useState(false);
 
   const { getToken } = useAuth();
 
   async function loadUsers() {
     try {
-      setRefreshing(true);
+      // Si es la primera carga (isLoading true), no activamos el spinner de refresh manual
+      if (!isLoading) setRefreshing(true);
+      
       const token = await getToken();
 
       if (!token) {
@@ -71,75 +62,28 @@ export default function UsersScreen() {
     }
   }
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  // ✅ USAMOS useFocusEffect PARA RECARGAR AL VOLVER A LA PANTALLA
+  useFocusEffect(
+    useCallback(() => {
+      loadUsers();
+    }, [])
+  );
 
-  // Función para alternar la visibilidad de inactivos
-  const toggleInactive = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowInactive(!showInactive);
-  };
-
-  // Lógica de separación
-  const activeUsers = users.filter(u => u.driver_status !== 'inactive');
-  const inactiveUsers = users.filter(u => u.driver_status === 'inactive');
-
-  // Componente para renderizar tarjeta (Reutilizable)
-  const UserCard = ({ u, isInactive }) => {
-    const isAdmin = u.role === "admin";
+  /**
+   * HELPER DE ESTADO
+   * Lee el campo 'driver_status' que viene del LEFT JOIN en el backend.
+   */
+  const getUserStatus = (u) => {
+    // 1. Si el campo existe (driver inactivo o activo explícito), úsalo.
+    if (u.driver_status) return u.driver_status;
     
-    return (
-      <TouchableOpacity
-        key={u.id}
-        activeOpacity={0.7}
-        onPress={() => router.push(`/Users/user-detail?id=${u.id}`)}
-        className={`p-4 rounded-xl mb-3 flex-row items-center border ${
-          isInactive 
-            ? "bg-gray-100 border-transparent opacity-60" // Estilo Inactivo (Gris, opaco)
-            : "bg-white shadow-sm border-gray-100"        // Estilo Activo (Blanco, sombra)
-        }`}
-      >
-        {/* Avatar */}
-        <View className={`h-14 w-14 rounded-full items-center justify-center mr-4 ${
-          isInactive ? "bg-gray-200" : "bg-gray-100"
-        }`}>
-          <Text className={`text-xl font-bold ${isInactive ? "text-gray-400" : "text-gray-500"}`}>
-            {u.full_name ? u.full_name.charAt(0).toUpperCase() : "?"}
-          </Text>
-        </View>
-
-        {/* Info */}
-        <View className="flex-1">
-          <View className="flex-row justify-between items-center mb-1">
-            <Text 
-              className={`text-lg font-bold flex-1 mr-2 ${isInactive ? "text-gray-500" : "text-gray-800"}`} 
-              numberOfLines={1}
-            >
-              {u.full_name || "Sin nombre"}
-            </Text>
-            
-            {/* Badge Rol/Estado */}
-            {isInactive ? (
-               <View className="bg-gray-200 px-2 py-0.5 rounded-full">
-                 <Text className="text-[10px] font-bold uppercase text-gray-500">INACTIVO</Text>
-               </View>
-            ) : (
-              <View className={`px-2 py-0.5 rounded-full ${isAdmin ? 'bg-purple-100' : 'bg-green-100'}`}>
-                <Text className={`text-[10px] font-bold uppercase ${isAdmin ? 'text-purple-700' : 'text-green-700'}`}>
-                  {u.role || "DRIVER"}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          <Text className="text-gray-400 text-sm mb-1" numberOfLines={1}>
-            {u.email}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
+    // 2. Si viene null (Admin o driver viejo sin registro), asume activo.
+    return 'active';
   };
+
+  // Filtramos las listas
+  const activeUsers = users.filter(u => getUserStatus(u) !== 'inactive');
+  const inactiveUsers = users.filter(u => getUserStatus(u) === 'inactive');
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -167,7 +111,7 @@ export default function UsersScreen() {
             </Text>
           </View>
 
-          {/* LOADING */}
+          {/* LOADING & EMPTY STATES */}
           {isLoading && users.length === 0 ? (
             <View className="py-24">
               <ActivityIndicator size="large" color="#ff6600" />
@@ -179,46 +123,30 @@ export default function UsersScreen() {
             </View>
           ) : (
             <View>
-              {/* 1. LISTA DE USUARIOS ACTIVOS */}
+              {/* 1. USUARIOS ACTIVOS */}
               <View>
                 {activeUsers.map((u) => (
-                  <UserCard key={u.id} u={u} isInactive={false} />
+                  <UserCard key={u.id} user={u} isInactive={false} />
                 ))}
               </View>
 
-              {/* 2. SECCIÓN DE INACTIVOS (Estilo WhatsApp) */}
+              {/* 2. USUARIOS INACTIVOS */}
               {inactiveUsers.length > 0 && (
-                <View className="mt-4">
-                  {/* Botón Colapsable */}
-                  <TouchableOpacity 
-                    onPress={toggleInactive}
-                    className="flex-row items-center justify-between bg-gray-200/50 p-3 rounded-lg mb-2"
-                  >
-                    <Text className="text-gray-500 font-semibold text-sm uppercase tracking-wide ml-2">
-                      Inactivos ({inactiveUsers.length})
-                    </Text>
-                    <Ionicons 
-                      name={showInactive ? "chevron-up" : "chevron-down"} 
-                      size={20} 
-                      color="#9ca3af" 
-                    />
-                  </TouchableOpacity>
-
-                  {/* Lista Oculta */}
-                  {showInactive && (
-                    <View className="mt-2">
-                      {inactiveUsers.map((u) => (
-                        <UserCard key={u.id} u={u} isInactive={true} />
-                      ))}
-                    </View>
-                  )}
+                <View className="mt-6">
+                  <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-3 ml-2">
+                    Inactivos ({inactiveUsers.length})
+                  </Text>
+                  
+                  {inactiveUsers.map((u) => (
+                    <UserCard key={u.id} user={u} isInactive={true} />
+                  ))}
                 </View>
               )}
             </View>
           )}
         </ScrollView>
 
-        {/* FAB */}
+        {/* FAB (Botón Agregar) */}
         <Link href="/(tabs)/Users/register" asChild>
           <TouchableOpacity
             activeOpacity={0.8}

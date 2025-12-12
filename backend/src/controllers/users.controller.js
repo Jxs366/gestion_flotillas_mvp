@@ -10,9 +10,16 @@ const clerkClient = createClerkClient({
 
 export const listUsers = async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM profiles ORDER BY created_at DESC"
-    );
+    // Usamos 'AS driver_status' para identificarlo claramente en el frontend
+    const { rows } = await pool.query(`
+      SELECT 
+        profiles.*, 
+        drivers.status AS driver_status 
+      FROM profiles
+      LEFT JOIN public.drivers AS drivers ON profiles.id = drivers.id
+      ORDER BY profiles.created_at DESC
+    `);
+    
     res.json(rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -62,10 +69,13 @@ export const getUserById = async (req, res) => {
   try {
     // 1. VALIDACIÓN INTELIGENTE
     // Expresión regular para saber si el ID es un UUID válido (formato 8-4-4-4-12 chars)
-    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    const isUuid =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        id
+      );
 
     let whereClause;
-    
+
     if (isUuid) {
       // Si es UUID, buscamos en la columna ID (Llave primaria de Postgres)
       whereClause = "WHERE p.id = $1";
@@ -88,13 +98,13 @@ export const getUserById = async (req, res) => {
     const { rows } = await pool.query(query, [id]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
     res.json(rows[0]);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error obteniendo detalles del usuario' });
+    res.status(500).json({ message: "Error obteniendo detalles del usuario" });
   }
 };
 
@@ -103,7 +113,7 @@ export const updateStatus = async (req, res) => {
   const { status } = req.body; // 'inactive' (para eliminar lógicamente)
 
   if (!status) {
-    return res.status(400).json({ message: 'El campo status es obligatorio' });
+    return res.status(400).json({ message: "El campo status es obligatorio" });
   }
 
   try {
@@ -111,16 +121,20 @@ export const updateStatus = async (req, res) => {
     const driver = await changeStatus(id, status);
 
     if (!driver) {
-      return res.status(404).json({ message: 'Conductor no encontrado o el usuario no es conductor.' });
+      return res
+        .status(404)
+        .json({
+          message: "Conductor no encontrado o el usuario no es conductor.",
+        });
     }
 
-    res.json({ message: 'Estado actualizado correctamente', driver });
+    res.json({ message: "Estado actualizado correctamente", driver });
   } catch (error) {
     console.error(error);
     // Si el error viene de nuestra validación de negocio en el servicio
-    if (error.message.includes('Estado inválido')) {
-        return res.status(400).json({ message: error.message });
+    if (error.message.includes("Estado inválido")) {
+      return res.status(400).json({ message: error.message });
     }
-    res.status(500).json({ message: 'Error interno del servidor' });
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
