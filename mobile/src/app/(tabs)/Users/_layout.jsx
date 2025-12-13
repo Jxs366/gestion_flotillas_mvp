@@ -4,8 +4,13 @@ import { Stack } from 'expo-router'
 
 const UsersLayout = () => {
   return (
-    <Stack>
-        <Stack.Screen name='index' options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        headerShown: false, // Puedes poner esto aquí para que aplique a todas
+        animation: 'none',  // Esta es la clave para quitar la animación
+      }}
+    >
+        <Stack.Screen name='index' />
     </Stack>
   )
 }

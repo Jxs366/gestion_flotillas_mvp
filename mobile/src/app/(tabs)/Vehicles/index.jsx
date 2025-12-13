@@ -1,11 +1,17 @@
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 // Asegúrate de que este componente (DashboardHeader) ya no tiene la clase 'shadow-...'
 import DashboardHeader from "../../components/DashboardHeader";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-
 
 const formatNumber = (num) => {
   if (!num) return "0";
@@ -27,67 +33,74 @@ const getStatusStyles = (status) => {
 };
 
 export default function VehiclesScreen() {
-
-  const [vehicles, setVehicles] = useState([])
-  const [refreshing, setRefreshing] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const { getToken } = useAuth()
+  const [vehicles, setVehicles] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { getToken } = useAuth();
 
   async function loadVehicles() {
     try {
-      setRefreshing(true)
-      const token = await getToken()
+      setRefreshing(true);
+      const token = await getToken();
 
       if (!token) {
-        console.error("❌ No hay token de autenticación")
-        setVehicles([])
-        return
+        console.error("❌ No hay token de autenticación");
+        setVehicles([]);
+        return;
       }
 
-      const res = await fetch("https://sensately-nonlaminable-tempie.ngrok-free.dev/api/vehicles", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-
-      // Verificar el status de la respuesta
-      if (!res.ok) {
-        const contentType = res.headers.get("content-type")
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await res.json()
-          console.error("❌ Error del servidor:", errorData)
-        } else {
-          console.error(`❌ Error HTTP ${res.status}: ${res.statusText}`)
+      // 1. CORRECCIÓN: Quitamos "https://" del inicio, confiamos en la variable de entorno
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/vehicles`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            // 2. CORRECCIÓN: Agregamos el header para Ngrok
+            "ngrok-skip-browser-warning": "true",
+            "User-Agent": "bypass-tunnel-reminder", // A veces ayuda también
+          },
         }
-        setVehicles([])
-        return
+      );
+
+      if (!res.ok) {
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await res.json();
+          console.error("❌ Error del servidor:", errorData);
+        } else {
+          console.error(`❌ Error HTTP ${res.status}: ${res.statusText}`);
+        }
+        setVehicles([]);
+        return;
       }
 
       // Verificar que el Content-Type sea JSON
-      const contentType = res.headers.get("content-type")
+      const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
-        console.error("❌ El servidor no devolvió JSON. Content-Type:", contentType)
-        setVehicles([])
-        return
+        console.error(
+          "❌ El servidor no devolvió JSON. Content-Type:",
+          contentType
+        );
+        setVehicles([]);
+        return;
       }
 
-      const data = await res.json()
-      setVehicles(Array.isArray(data) ? data : [])
+      const data = await res.json();
+      setVehicles(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("❌ Error al cargar vehículos:", error.message)
-      setVehicles([])
+      console.error("❌ Error al cargar vehículos:", error.message);
+      setVehicles([]);
     } finally {
-      setRefreshing(false)
-      setIsLoading(false)
+      setRefreshing(false);
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    loadVehicles()
+    loadVehicles();
     console.log(vehicles);
-  }, [])
-
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -130,7 +143,9 @@ export default function VehiclesScreen() {
               <TouchableOpacity
                 key={v.id}
                 className="bg-white p-4 rounded-xl mb-4 flex-row justify-between"
-                onPress={() => router.push(`/Vehicles/detalle-vehicle?id=${v.id}`)}
+                onPress={() =>
+                  router.push(`/Vehicles/detalle-vehicle?id=${v.id}`)
+                }
               >
                 <View className="flex-row items-center">
                   <View className="bg-gray-100 rounded-xl p-3 mr-3">
@@ -138,15 +153,23 @@ export default function VehiclesScreen() {
                   </View>
 
                   <View>
-                    <Text className="text-lg font-bold text-gray-800">{v.model}</Text>
+                    <Text className="text-lg font-bold text-gray-800">
+                      {v.model}
+                    </Text>
                     <Text className="text-gray-600">Placas: {v.plate}</Text>
                     <Text className="text-gray-600">
                       KM: {formatNumber(v.current_odometer)}
                     </Text>
-                    <Text className="text-gray-600">Conductor: {v.driver || "N/A"}</Text>
+                    <Text className="text-gray-600">
+                      Conductor: {v.driver || "N/A"}
+                    </Text>
 
-                    <View className={`${statusStyles.bgColor} mt-1 px-3 py-1 rounded-full self-start`}>
-                      <Text className={`text-xs font-bold ${statusStyles.textColor}`}>
+                    <View
+                      className={`${statusStyles.bgColor} mt-1 px-3 py-1 rounded-full self-start`}
+                    >
+                      <Text
+                        className={`text-xs font-bold ${statusStyles.textColor}`}
+                      >
                         {v.status?.toUpperCase()}
                       </Text>
                     </View>
