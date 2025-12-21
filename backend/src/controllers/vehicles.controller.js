@@ -1,4 +1,3 @@
-// src/controllers/vehicles.controller.js
 import vehicleModel from '../models/vehicle.model.js'; // Asegúrate de importar tu modelo
 
 export const listVehicles = async (req, res) => {
@@ -21,7 +20,6 @@ export const addVehicle = async (req, res) => {
     }
 
     // 3. Llamar al modelo pasando el objeto completo
-    // Nota: Asegúrate de que tu función vehicleModel.create acepte estos parámetros
     const newVehicle = await vehicleModel.create({ 
         plate, model, vin, make, year, current_odometer 
     });

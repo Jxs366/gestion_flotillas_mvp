@@ -6,8 +6,8 @@ const UsersLayout = () => {
   return (
     <Stack
       screenOptions={{
-        headerShown: false, // Puedes poner esto aquí para que aplique a todas
-        animation: 'none',  // Esta es la clave para quitar la animación
+        headerShown: false, 
+        animation: 'none', 
       }}
     >
       <Stack.Screen name='index' />

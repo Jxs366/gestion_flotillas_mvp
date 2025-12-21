@@ -34,8 +34,12 @@ export const handleClerkWebhook = async (req, res) => {
 
 
   try {
+<<<<<<< HEAD
     // Se pasa el payload (string) y los headers para la verificación
     evt = wh.verify(payload, {
+=======
+    evt = wh.verify(req.body, {
+>>>>>>> guillermo
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
@@ -55,13 +59,13 @@ export const handleClerkWebhook = async (req, res) => {
       await syncNewUser(evt.data);
       
     } else if (eventType === 'user.deleted') {
+<<<<<<< HEAD
       // Manejo de eliminación
+=======
+>>>>>>> guillermo
       await deleteUser(evt.data);
     }
     
-    // Si quisieras manejar actualizaciones:
-    // else if (eventType === 'user.updated') { ... }
-
     res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error procesando webhook:', error);

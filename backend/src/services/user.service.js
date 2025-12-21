@@ -10,7 +10,7 @@ export const syncNewUser = async (clerkData) => {
   // 1. Verificamos qué metadata llegó realmente
   console.log("📦 Metadata recibida:", JSON.stringify(public_metadata, null, 2));
 
-  // Si no llega metadata, asumimos driver? Ojo con esto.
+  // Si no llega metadata, asumimos driver.
   const role = public_metadata?.role || 'driver'; 
   console.log(`👤 Rol detectado: ${role}`);
 

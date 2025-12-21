@@ -1,5 +1,4 @@
 import pool from "../db/connection.js";
-// Importamos el creador del cliente de Clerk
 import { createClerkClient } from "@clerk/backend";
 import { changeStatus } from "../services/user.service.js";
 
@@ -10,7 +9,6 @@ const clerkClient = createClerkClient({
 
 export const listUsers = async (req, res) => {
   try {
-    // Usamos 'AS driver_status' para identificarlo claramente en el frontend
     const { rows } = await pool.query(`
       SELECT 
         profiles.*, 
@@ -67,8 +65,6 @@ export const getUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // 1. VALIDACIÓN INTELIGENTE
-    // Expresión regular para saber si el ID es un UUID válido (formato 8-4-4-4-12 chars)
     const isUuid =
       /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
         id
@@ -77,10 +73,8 @@ export const getUserById = async (req, res) => {
     let whereClause;
 
     if (isUuid) {
-      // Si es UUID, buscamos en la columna ID (Llave primaria de Postgres)
       whereClause = "WHERE p.id = $1";
     } else {
-      // Si NO es UUID (ej. "user_2a..."), buscamos en la columna CLERK_ID
       whereClause = "WHERE p.clerk_id = $1";
     }
 
@@ -109,15 +103,14 @@ export const getUserById = async (req, res) => {
 };
 
 export const updateStatus = async (req, res) => {
-  const { id } = req.params; // UUID del usuario
-  const { status } = req.body; // 'inactive' (para eliminar lógicamente)
+  const { id } = req.params;
+  const { status } = req.body;
 
   if (!status) {
     return res.status(400).json({ message: "El campo status es obligatorio" });
   }
 
   try {
-    // Llamamos al servicio
     const driver = await changeStatus(id, status);
 
     if (!driver) {
@@ -131,7 +124,6 @@ export const updateStatus = async (req, res) => {
     res.json({ message: "Estado actualizado correctamente", driver });
   } catch (error) {
     console.error(error);
-    // Si el error viene de nuestra validación de negocio en el servicio
     if (error.message.includes("Estado inválido")) {
       return res.status(400).json({ message: error.message });
     }

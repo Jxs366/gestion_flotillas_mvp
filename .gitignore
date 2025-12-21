@@ -3,7 +3,6 @@
 ############################
 backend/node_modules/
 backend/.env
-backend/.env.*
 backend/.DS_Store
 
 # Logs
@@ -34,7 +33,6 @@ backend/ngrok.log
 frontend/node_modules/
 frontend/.expo/
 frontend/.env
-frontend/.env.*
 frontend/.DS_Store
 frontend/.expo-shared/
 
@@ -61,9 +59,7 @@ frontend/pnpm-debug.log*
 
 # Env files
 .env
-.env.*
 *.env
-*.env.*
 
 # System files
 .DS_Store

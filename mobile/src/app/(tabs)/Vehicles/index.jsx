@@ -5,14 +5,20 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+<<<<<<< HEAD
   // Eliminados: RefreshControl, ActivityIndicator (para evitar el error)
+=======
+>>>>>>> guillermo
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import DashboardHeader from "../../components/DashboardHeader";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
+<<<<<<< HEAD
 import * as React from 'react';
+=======
+>>>>>>> guillermo
 
 const formatNumber = (num) => {
   if (!num) return "0";
@@ -40,22 +46,37 @@ export default function VehiclesScreen() {
 
   async function loadVehicles() {
     try {
+<<<<<<< HEAD
       // Simplificado: Sin chequeo de 'refreshing' aquí
       setIsLoading(true);
       const token = await getToken();
 
       if (!token) {
         console.error("No hay token de autenticación");
+=======
+      setRefreshing(true);
+      const token = await getToken();
+
+      if (!token) {
+        console.error("❌ No hay token de autenticación");
+>>>>>>> guillermo
         setVehicles([]);
         return;
       }
 
+<<<<<<< HEAD
       const res = await fetch(
         "https://sensately-nonlaminable-tempie.ngrok-free.dev/api/vehicles",
+=======
+      // 1. CORRECCIÓN: Quitamos "https://" del inicio, confiamos en la variable de entorno
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/vehicles`,
+>>>>>>> guillermo
         {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
+<<<<<<< HEAD
           },
         }
       );
@@ -67,6 +88,42 @@ export default function VehiclesScreen() {
 
     } catch (error) {
       console.error("Error al cargar vehículos:", error.message);
+=======
+            // 2. CORRECCIÓN: Agregamos el header para Ngrok
+            "ngrok-skip-browser-warning": "true",
+            "User-Agent": "bypass-tunnel-reminder", // A veces ayuda también
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await res.json();
+          console.error("❌ Error del servidor:", errorData);
+        } else {
+          console.error(`❌ Error HTTP ${res.status}: ${res.statusText}`);
+        }
+        setVehicles([]);
+        return;
+      }
+
+      // Verificar que el Content-Type sea JSON
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error(
+          "❌ El servidor no devolvió JSON. Content-Type:",
+          contentType
+        );
+        setVehicles([]);
+        return;
+      }
+
+      const data = await res.json();
+      setVehicles(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("❌ Error al cargar vehículos:", error.message);
+>>>>>>> guillermo
       setVehicles([]);
     } finally {
       setRefreshing(false);
@@ -76,6 +133,10 @@ export default function VehiclesScreen() {
 
   useEffect(() => {
     loadVehicles();
+<<<<<<< HEAD
+=======
+    console.log(vehicles);
+>>>>>>> guillermo
   }, []);
 
   return (
@@ -122,14 +183,22 @@ export default function VehiclesScreen() {
             return (
               <TouchableOpacity
                 key={v.id}
+<<<<<<< HEAD
                 className="bg-white p-4 rounded-xl mb-3 flex-row items-center justify-between shadow-sm border border-gray-200"
                 onPress={() => router.push(`/Vehicles/detalle-vehicle?id=${v.id}`)}
+=======
+                className="bg-white p-4 rounded-xl mb-4 flex-row justify-between"
+                onPress={() =>
+                  router.push(`/Vehicles/detalle-vehicle?id=${v.id}`)
+                }
+>>>>>>> guillermo
               >
                 <View className="flex-row items-center flex-1 pr-2">
                   <View className="bg-gray-100 rounded-xl p-3 mr-3">
                     <Ionicons name="car" size={30} color="#ff6600" />
                   </View>
 
+<<<<<<< HEAD
                   {/* Bloque de Detalles */}
                   <View className="flex-shrink">
                     <Text className="text-lg font-bold text-gray-800">
@@ -145,6 +214,29 @@ export default function VehiclesScreen() {
                     <Text className="text-gray-600 text-sm">
                       Conductor: {v.driver || "N/A"}
                     </Text>
+=======
+                  <View>
+                    <Text className="text-lg font-bold text-gray-800">
+                      {v.model}
+                    </Text>
+                    <Text className="text-gray-600">Placas: {v.plate}</Text>
+                    <Text className="text-gray-600">
+                      KM: {formatNumber(v.current_odometer)}
+                    </Text>
+                    <Text className="text-gray-600">
+                      Conductor: {v.driver || "N/A"}
+                    </Text>
+
+                    <View
+                      className={`${statusStyles.bgColor} mt-1 px-3 py-1 rounded-full self-start`}
+                    >
+                      <Text
+                        className={`text-xs font-bold ${statusStyles.textColor}`}
+                      >
+                        {v.status?.toUpperCase()}
+                      </Text>
+                    </View>
+>>>>>>> guillermo
                   </View>
                 </View>
 
