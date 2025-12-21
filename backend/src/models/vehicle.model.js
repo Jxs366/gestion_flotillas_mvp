@@ -1,6 +1,5 @@
 import pool from '../db/connection.js'; 
 
-// --- Funciones de lectura ---
 const findAll = async () => {
   const { rows } = await pool.query('SELECT * FROM vehicles ORDER BY created_at DESC'); 
   return rows;
@@ -49,13 +48,12 @@ const assignToDriver = async (vehicleId, driverId) => {
   }
 };
 
-// --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
 const unassign = async (vehicleId) => {
-  let client; // Declarar afuera
+  let client;
   console.log("🛠️ Modelo: Iniciando desvinculación para:", vehicleId);
   
   try {
-    client = await pool.connect(); // Intentar conectar
+    client = await pool.connect();
     await client.query("BEGIN");
 
     await client.query(`

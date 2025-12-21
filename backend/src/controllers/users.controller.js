@@ -1,5 +1,4 @@
 import pool from "../db/connection.js";
-// Importamos el creador del cliente de Clerk
 import { createClerkClient } from "@clerk/backend";
 import { changeStatus } from "../services/user.service.js";
 

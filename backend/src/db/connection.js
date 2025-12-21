@@ -1,6 +1,5 @@
-// src/db/connection.js
 import pg from 'pg';
-import 'dotenv/config'; // Esto reemplaza a require('dotenv').config()
+import 'dotenv/config';
 
 const { Pool } = pg;
 
@@ -12,7 +11,6 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-// Agregamos un pequeño log para saber si se conectó (opcional pero útil)
 pool.on('connect', () => {
   console.log('🔌 Base de datos conectada');
 });
