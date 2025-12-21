@@ -1,11 +1,15 @@
+// webhook.controller.js
 import { Webhook } from 'svix';
-// 1. IMPORTANTE: Agregamos deleteUser a la importación
 import { syncNewUser, deleteUser } from '../services/user.service.js'; 
 
 export const handleClerkWebhook = async (req, res) => {
-  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+  // Asegúrate de que esta variable de entorno esté cargada correctamente (e.g., usando dotenv)
+  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET; 
 
   if (!WEBHOOK_SECRET) {
+    // Es buena práctica usar el valor que conoces para depurar si falla la carga de .env
+    // console.log("Usando clave de webhook hardcodeada para test: whsec_iHjwhKPxtO+Lzop2B8b30QVF0rhS4w1r");
+    // const WEBHOOK_SECRET = 'whsec_iHjwhKPxtO+Lzop2B8b30QVF0rhS4w1r'; 
     throw new Error('Falta CLERK_WEBHOOK_SECRET en .env');
   }
 
@@ -23,16 +27,21 @@ export const handleClerkWebhook = async (req, res) => {
   const wh = new Webhook(WEBHOOK_SECRET);
   let evt;
 
+  // 💡 SOLUCIÓN FINAL: Convertir req.body a string en crudo (utf8).
+  // Esto es crucial porque body-parser.raw devuelve un Buffer, 
+  // y la verificación de Svix requiere un string/Buffer sin alteraciones.
+  const payload = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
+
+
   try {
-    // Nota: wh.verify necesita el payload como string (req.body raw), 
-    // asegúrate de que tu configuración de express no lo haya parseado a JSON antes de este punto
-    // o usa una librería como body-parser para obtener el raw body si es necesario.
-    evt = wh.verify(req.body, {
+    // Se pasa el payload (string) y los headers para la verificación
+    evt = wh.verify(payload, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     });
   } catch (err) {
+    // Si la verificación falla, se imprime el error y se devuelve 400
     console.error('Firma inválida:', err);
     return res.status(400).send('Error de verificación');
   }
@@ -46,7 +55,7 @@ export const handleClerkWebhook = async (req, res) => {
       await syncNewUser(evt.data);
       
     } else if (eventType === 'user.deleted') {
-      // 2. NUEVO: Manejo de eliminación
+      // Manejo de eliminación
       await deleteUser(evt.data);
     }
     

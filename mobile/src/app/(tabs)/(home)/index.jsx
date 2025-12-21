@@ -1,4 +1,3 @@
-
 // app/dashboard/index.jsx
 import { useUser } from "@clerk/clerk-expo";
 import {
@@ -13,6 +12,13 @@ import { Ionicons } from "@expo/vector-icons";
 import DashboardHeader from "../../components/DashboardHeader";
 import { router } from "expo-router";
 
+const PRIMARY_COLOR = "text-orange-600";
+const TEXT_DARK = "text-gray-800";
+const TEXT_MUTED = "text-gray-500";
+const BG_CARD = "bg-white";
+const BG_APP = "bg-gray-100";
+const BORDER_COLOR = "border-gray-200";
+
 export default function DashboardScreen() {
     const { user } = useUser();
 
@@ -20,84 +26,107 @@ export default function DashboardScreen() {
         <SafeAreaView className="flex-1 bg-white">
             <StatusBar barStyle="dark-content" />
 
-            {/* HEADER */}
+            {/* HEADER*/}
             <DashboardHeader />
 
-            {/* CONTENIDO */}
-            <ScrollView className="flex-1 bg-gray-100">
-                <View className="px-5 py-5">
+            {/* CONTENIDO*/}
+            <ScrollView className={`flex-1 ${BG_APP}`}>
+                <View className="px-4 py-4">
 
-                    {/* KPIs */}
+                    {/*KPIs*/}
                     <View className="flex-row flex-wrap justify-between">
-                        <View className="bg-white w-[48%] p-5 rounded-xl mb-4 items-center">
-                            <Text className="text-3xl font-bold text-orange-600">15</Text>
-                            <Text className="text-gray-800">Disponibles</Text>
+
+                        {/* KPI: Disponibles */}
+                        <View className={`${BG_CARD} w-[48%] p-5 rounded-xl mb-4 items-center shadow-sm border ${BORDER_COLOR}`}>
+                            <Text className={`text-4xl font-extrabold ${PRIMARY_COLOR}`}>15</Text>
+                            <Text className={`text-sm ${TEXT_MUTED} mt-1`}>Disponibles</Text>
                         </View>
 
-                        <View className="bg-white w-[48%] p-5 rounded-xl mb-4 items-center">
-                            <Text className="text-3xl font-bold text-orange-600">7</Text>
-                            <Text className="text-gray-800">En Uso</Text>
+                        {/* KPI: En Uso*/}
+                        <View className={`${BG_CARD} w-[48%] p-5 rounded-xl mb-4 items-center shadow-sm border ${BORDER_COLOR}`}>
+                            <Text className={`text-4xl font-extrabold ${PRIMARY_COLOR}`}>7</Text>
+                            <Text className={`text-sm ${TEXT_MUTED} mt-1`}>En Uso</Text>
                         </View>
 
-                        <View className="bg-white w-[48%] p-5 rounded-xl mb-4 items-center">
-                            <Text className="text-3xl font-bold text-orange-600">3</Text>
-                            <Text className="text-gray-800">Mantenimiento</Text>
+                        {/* KPI: Mantenimiento*/}
+                        <View className={`${BG_CARD} w-[48%] p-5 rounded-xl mb-4 items-center shadow-sm border ${BORDER_COLOR}`}>
+                            <Text className={`text-4xl font-extrabold ${PRIMARY_COLOR}`}>3</Text>
+                            <Text className={`text-sm ${TEXT_MUTED} mt-1`}>Mantenimiento</Text>
                         </View>
 
-                        <View className="bg-white w-[48%] p-5 rounded-xl mb-4 items-center">
-                            <Text className="text-3xl font-bold text-orange-600">7</Text>
-                            <Text className="text-gray-800">Asignaciones</Text>
+                        {/* KPI: Asignaciones*/}
+                        <View className={`${BG_CARD} w-[48%] p-5 rounded-xl mb-4 items-center shadow-sm border ${BORDER_COLOR}`}>
+                            <Text className={`text-4xl font-extrabold ${PRIMARY_COLOR}`}>7</Text>
+                            <Text className={`text-sm ${TEXT_MUTED} mt-1`}>Asignaciones Activas</Text>
                         </View>
                     </View>
 
-                    {/* ACCIONES RÁPIDAS */}
-                    <Text className="text-xl font-bold mt-4 mb-2 text-gray-800">
+                    {/* --- ACCIONES RÁPIDAS --- */}
+                    <Text className={`text-xl font-bold mt-4 mb-3 ${TEXT_DARK}`}>
                         Acciones Rápidas
                     </Text>
 
-                    <TouchableOpacity className="bg-white flex-row items-center p-4 rounded-xl mb-3">
-                        <Ionicons name="document-text" size={28} color="#ff6600" />
-                        <Text className="text-base ml-3 text-gray-800">Nueva Asignación</Text>
+
+                    <TouchableOpacity className={`${BG_CARD} flex-row items-center p-4 rounded-xl mb-3 shadow-sm border ${BORDER_COLOR}`}>
+                        <View className={`p-2 rounded-lg bg-orange-100 mr-3`}>
+                            <Ionicons name="document-text-outline" size={24} color="#f97316" />
+                        </View>
+                        <Text className={`text-base font-medium ${TEXT_DARK}`}>Nueva Asignación</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity className="bg-white flex-row items-center p-4 rounded-xl mb-3">
-                        <Ionicons name="build" size={28} color="#ff6600" />
-                        <Text className="text-base ml-3 text-gray-800">
+                    <TouchableOpacity className={`${BG_CARD} flex-row items-center p-4 rounded-xl mb-3 shadow-sm border ${BORDER_COLOR}`}>
+                        <View className={`p-2 rounded-lg bg-orange-100 mr-3`}>
+                            <Ionicons name="build-outline" size={24} color="#f97316" />
+                        </View>
+                        <Text className={`text-base font-medium ${TEXT_DARK}`}>
                             Registrar Mantenimiento
                         </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        className="bg-white flex-row items-center p-4 rounded-xl mb-3"
+                        className={`${BG_CARD} flex-row items-center p-4 rounded-xl mb-3 shadow-sm border ${BORDER_COLOR}`}
                         onPress={() => router.push("/Vehicles/create-vehicle")}
                     >
-                        <Ionicons name="car" size={28} color="#ff6600" />
-                        <Text className="text-base ml-3 text-gray-800">Crear Vehículo</Text>
+                        <View className={`p-2 rounded-lg bg-orange-100 mr-3`}>
+                            <Ionicons name="car-outline" size={24} color="#f97316" />
+                        </View>
+                        <Text className={`text-base font-medium ${TEXT_DARK}`}>Crear Vehículo</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        className="bg-white flex-row items-center p-4 rounded-xl mb-3"
+                        className={`${BG_CARD} flex-row items-center p-4 rounded-xl mb-3 shadow-sm border ${BORDER_COLOR}`}
                         onPress={() => router.push("/Users/register")}
                     >
-                        <Ionicons name="person-add" size={28} color="#ff6600" />
-                        <Text className="text-base ml-3 text-gray-800">Crear Conductor</Text>
+                        <View className={`p-2 rounded-lg bg-orange-100 mr-3`}>
+                            <Ionicons name="person-add-outline" size={24} color="#f97316" />
+                        </View>
+                        <Text className={`text-base font-medium ${TEXT_DARK}`}>Crear Conductor</Text>
                     </TouchableOpacity>
 
-                    {/* PRÓXIMOS MANTENIMIENTOS */}
-                    <View className="bg-white p-5 rounded-xl mt-2 mb-10 border border-gray-200">
-                        <Text className="text-2xl font-bold text-gray-900 mb-4">
+                    {/* --- PRÓXIMOS MANTENIMIENTOS --- */}
+                    <View className={`${BG_CARD} p-5 rounded-xl mt-4 mb-10 shadow-sm border ${BORDER_COLOR}`}>
+
+                        <Text className={`text-xl font-bold ${TEXT_DARK} mb-3`}>
                             Próximos Mantenimientos
                         </Text>
 
-                        <View className="border-l-4 border-orange-500 pl-3 py-1 mb-3">
-                            <Text className="text-gray-900 font-medium">Tsuru P01-ABC</Text>
-                            <Text className="text-gray-600 text-sm">155,000 km</Text>
+                        <View className={`flex-row justify-between items-center py-2 border-b ${BORDER_COLOR}`}>
+                            <View className="flex-row items-center">
+                                {/* Usamos Naranja para el warning */}
+                                <Ionicons name="warning-outline" size={20} color="#f97316" />
+                                <Text className={`font-medium ml-2 ${TEXT_DARK}`}>Tsuru P01-ABC</Text>
+                            </View>
+                            <Text className={`text-sm font-semibold ${PRIMARY_COLOR}`}>155,000 km</Text>
                         </View>
 
-                        <View className="border-l-4 border-orange-500 pl-3 py-1">
-                            <Text className="text-gray-900 font-medium">Frontier P02-DEF</Text>
-                            <Text className="text-gray-600 text-sm">90,000 km</Text>
+                        <View className="flex-row justify-between items-center py-2">
+                            <View className="flex-row items-center">
+                                <Ionicons name="warning-outline" size={20} color="#f97316" />
+                                <Text className={`font-medium ml-2 ${TEXT_DARK}`}>Frontier P02-DEF</Text>
+                            </View>
+                            <Text className={`text-sm font-semibold ${PRIMARY_COLOR}`}>90,000 km</Text>
                         </View>
+
                     </View>
 
                 </View>

@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  StatusBar,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -23,6 +24,14 @@ export default function CreateVehicleScreen() {
   const [plate, setPlate] = useState("")
   const [odometer, setOdometer] = useState("")
   const [isSaving, setIsSaving] = useState(false)
+
+  // Definiciones de color y estilo
+  const TEXT_DARK = "text-gray-800";
+  const TEXT_MUTED = "text-gray-600";
+  const BG_APP = "bg-gray-100";
+  const PRIMARY_COLOR_BG = "bg-orange-500";
+  const BORDER_SECONDARY = "border-gray-400";
+  const TEXT_SECONDARY = "text-gray-700";
 
   async function saveVehicle() {
     if (!vin || !make || !model || !plate) {
@@ -69,7 +78,8 @@ export default function CreateVehicleScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className={`flex-1 ${BG_APP}`}>
+      <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: "padding", android: undefined })}
         className="flex-1"
@@ -77,28 +87,28 @@ export default function CreateVehicleScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           className="flex-1"
-          contentContainerClassName="px-6 pb-24 pt-2"
+          contentContainerClassName="px-6 pb-10"
         >
 
-          {/* CARD HEADER */}
-          <View className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <Text className="text-xs uppercase tracking-wide text-gray-500">
+          {/*HEADER*/}
+          <View className="mb-6">
+            <Text className={`text-sm uppercase tracking-wider ${TEXT_MUTED}`}>
               Nuevo registro
             </Text>
-            <Text className="mt-1 text-3xl font-semibold text-gray-900">
+            <Text className={`mt-1 text-3xl font-extrabold text-gray-900`}>
               Agrega un vehículo
             </Text>
-            <Text className="mt-2 text-gray-600">
+            <Text className={`mt-2 ${TEXT_MUTED}`}>
               Ingresa los datos técnicos de la unidad.
             </Text>
           </View>
 
           {/* FORMULARIO */}
-          <View className="mt-8 gap-6">
+          <View className="mt-2 gap-6">
 
             {/* VIN */}
             <View>
-              <Text className="text-sm font-medium uppercase text-gray-600">
+              <Text className={`text-sm font-medium uppercase ${TEXT_MUTED}`}>
                 VIN (Número de Serie) *
               </Text>
               <TextInput
@@ -106,14 +116,14 @@ export default function CreateVehicleScreen() {
                 onChangeText={(t) => setVin(t.toUpperCase())}
                 placeholder="Ej. 1HGCM826..."
                 placeholderTextColor="#9ca3af"
-                className="mt-2 w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-base text-gray-900"
+                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm"
               />
             </View>
 
             {/* MARCA - MODELO */}
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-sm font-medium uppercase text-gray-600">
+                <Text className={`text-sm font-medium uppercase ${TEXT_MUTED}`}>
                   Marca *
                 </Text>
                 <TextInput
@@ -121,12 +131,12 @@ export default function CreateVehicleScreen() {
                   onChangeText={setMake}
                   placeholder="Toyota"
                   placeholderTextColor="#9ca3af"
-                  className="mt-2 w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-base text-gray-900"
+                  className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm"
                 />
               </View>
 
               <View className="flex-1">
-                <Text className="text-sm font-medium uppercase text-gray-600">
+                <Text className={`text-sm font-medium uppercase ${TEXT_MUTED}`}>
                   Modelo *
                 </Text>
                 <TextInput
@@ -134,7 +144,7 @@ export default function CreateVehicleScreen() {
                   onChangeText={setModel}
                   placeholder="Hilux"
                   placeholderTextColor="#9ca3af"
-                  className="mt-2 w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-base text-gray-900"
+                  className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm"
                 />
               </View>
             </View>
@@ -142,7 +152,7 @@ export default function CreateVehicleScreen() {
             {/* AÑO - PLACA */}
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-sm font-medium uppercase text-gray-600">
+                <Text className={`text-sm font-medium uppercase ${TEXT_MUTED}`}>
                   Año
                 </Text>
                 <TextInput
@@ -151,12 +161,12 @@ export default function CreateVehicleScreen() {
                   placeholder="2023"
                   keyboardType="numeric"
                   placeholderTextColor="#9ca3af"
-                  className="mt-2 w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-base text-gray-900"
+                  className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm"
                 />
               </View>
 
               <View className="flex-1">
-                <Text className="text-sm font-medium uppercase text-gray-600">
+                <Text className={`text-sm font-medium uppercase ${TEXT_MUTED}`}>
                   Placa *
                 </Text>
                 <TextInput
@@ -165,14 +175,14 @@ export default function CreateVehicleScreen() {
                   placeholder="ABC1234"
                   autoCapitalize="characters"
                   placeholderTextColor="#9ca3af"
-                  className="mt-2 w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-base text-gray-900 tracking-widest"
+                  className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 tracking-widest shadow-sm"
                 />
               </View>
             </View>
 
             {/* ODOMETRO */}
             <View>
-              <Text className="text-sm font-medium uppercase text-gray-600">
+              <Text className={`text-sm font-medium uppercase ${TEXT_MUTED}`}>
                 Kilometraje Inicial
               </Text>
               <TextInput
@@ -181,7 +191,7 @@ export default function CreateVehicleScreen() {
                 keyboardType="numeric"
                 placeholder="0"
                 placeholderTextColor="#9ca3af"
-                className="mt-2 w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-base text-gray-900"
+                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm"
               />
             </View>
 
@@ -189,21 +199,23 @@ export default function CreateVehicleScreen() {
 
           {/* BOTONES */}
           <View className="mt-10 gap-4">
+            {/* BOTÓN GUARDAR */}
             <TouchableOpacity
               onPress={saveVehicle}
               disabled={isSaving}
               activeOpacity={0.85}
-              className={`w-full rounded-2xl py-4 shadow-md ${isSaving ? "bg-orange-400/60" : "bg-orange-500"
+              className={`w-full rounded-xl py-4 shadow-lg ${isSaving ? "bg-orange-400/60" : PRIMARY_COLOR_BG
                 }`}
             >
-              <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
+              <Text className="text-center text-lg font-semibold tracking-wide text-white">
                 {isSaving ? "Guardando..." : "Guardar vehículo"}
               </Text>
             </TouchableOpacity>
 
+            {/* BOTÓN SECUNDARIO */}
             <Link href="/Vehicles" replace asChild>
-              <TouchableOpacity className="w-full rounded-2xl border border-gray-300 py-4 bg-white">
-                <Text className="text-center text-base font-semibold uppercase tracking-wide text-gray-800">
+              <TouchableOpacity className={`w-full rounded-xl border ${BORDER_SECONDARY} py-4 bg-white shadow-sm`}>
+                <Text className={`text-center text-lg font-semibold tracking-wide ${TEXT_SECONDARY}`}>
                   Ver listado
                 </Text>
               </TouchableOpacity>

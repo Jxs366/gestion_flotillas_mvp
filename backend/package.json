@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ngrok": ".\\ngrok http --domain=raptureless-iridescently-monte.ngrok-free.dev 4000"
+    "ngrok": ".\\ngrok http --domain=sensately-nonlaminable-tempie.ngrok-free.dev 4000"
   },
   "keywords": [],
   "author": "",
@@ -21,3 +21,4 @@
     "svix": "^1.82.0"
   }
 }
+
