@@ -43,7 +43,6 @@ export default function UserDetailScreen() {
     try {
       const token = await getToken();
       if (!token) return;
-<<<<<<< HEAD
       const url = `${process.env.EXPO_PUBLIC_API_URL}/api/users/${id}`;
 
       const res = await fetch(url, {
@@ -58,18 +57,6 @@ export default function UserDetailScreen() {
         const errorText = await res.text();
         throw new Error(`Error ${res.status}: ${errorText}`);
       }
-=======
-
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/users/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
-      );
->>>>>>> guillermo
 
       if (!res.ok) throw new Error("Error cargando usuario");
       const data = await res.json();
