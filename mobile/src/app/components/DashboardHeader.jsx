@@ -8,18 +8,18 @@ export default function DashboardHeader({ navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
 
   return (
-    <View className="flex-row items-center justify-between pr-4 pl-4 bg-white">
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
 
       {/* LOGO */}
       <Image
         source={require("../../../assets/images/logo-empresa.png")}
-        className="w-40 h-28"
+        className="w-48 h-16"
         resizeMode="contain"
       />
 
-      {/* Botón de Menú (3 puntitos) */}
-      <TouchableOpacity onPress={() => setMenuVisible(true)}>
-        <Ionicons name="menu" size={32} color="#333" />
+      {/* Botón de Menú */}
+      <TouchableOpacity onPress={() => setMenuVisible(true)} className="p-1">
+        <Ionicons name="ellipsis-vertical" size={24} color="#333" />
       </TouchableOpacity>
 
       {/* MENÚ MODAL */}
@@ -34,16 +34,19 @@ export default function DashboardHeader({ navigation }) {
           onPress={() => setMenuVisible(false)}
           activeOpacity={1}
         >
-          <View className="absolute top-20 right-5 bg-white rounded-xl p-3 border border-gray-200">
+          <View className="absolute top-16 right-3 bg-white rounded-xl p-2 shadow-lg border border-gray-100 z-50">
 
             <TouchableOpacity
-              className="p-2"
+              className="px-3 py-2 flex-row items-center"
               onPress={() => {
                 setMenuVisible(false);
                 signOut();
               }}
             >
-              <Text className="text-gray-800 text-base">Cerrar sesión</Text>
+              <Ionicons name="log-out-outline" size={20} color="#ff3b30" />
+              <Text className="text-gray-800 text-base font-medium ml-2 text-red-500">
+                Cerrar sesión
+              </Text>
             </TouchableOpacity>
 
           </View>

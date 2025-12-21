@@ -16,11 +16,11 @@ import { SafeAreaView } from "react-native-safe-area-context"
 export default function CreateAreaScreen() {
   const { getToken } = useAuth()
   const router = useRouter()
-  
+
   // Estados para los campos de la tabla Areas
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  
+
   const [isSaving, setIsSaving] = useState(false)
 
   async function saveArea() {
@@ -38,7 +38,7 @@ export default function CreateAreaScreen() {
         throw new Error("No hay sesión activa. Por favor, inicia sesión nuevamente.")
       }
 
-      // Usa tu URL de Ngrok (o la variable de entorno)
+      //Usa tu URL de Ngrok (o la variable de entorno)
       const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://raptureless-iridescently-monte.ngrok-free.dev/api";
 
       const res = await fetch(`${API_URL}/areas`, {
@@ -65,15 +65,13 @@ export default function CreateAreaScreen() {
         throw new Error(errorData.message || "No se pudo guardar el área")
       }
 
-      // Éxito
       Alert.alert("Área registrada", "La zona se ha guardado correctamente 🎉", [
-        { 
-          text: "OK", 
+        {
+          text: "OK",
           onPress: () => {
-             // Limpiar campos y volver al listado
-             setName("")
-             setDescription("")
-             router.replace("/Areas") 
+            setName("")
+            setDescription("")
+            router.replace("/Areas")
           }
         }
       ])
@@ -109,8 +107,8 @@ export default function CreateAreaScreen() {
           </View>
 
           <View className="mt-10 gap-6">
-            
-            {/* --- NOMBRE (Obligatorio) --- */}
+
+            {/* NOMBRE*/}
             <View>
               <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
                 Nombre del Área *
@@ -125,7 +123,7 @@ export default function CreateAreaScreen() {
               />
             </View>
 
-            {/* --- DESCRIPCIÓN (Opcional - Multilínea) --- */}
+            {/*DESCRIPCIÓN*/}
             <View>
               <Text className="text-sm font-medium uppercase tracking-wide text-white/60">
                 Descripción
@@ -149,9 +147,8 @@ export default function CreateAreaScreen() {
               onPress={saveArea}
               disabled={isSaving}
               activeOpacity={0.85}
-              className={`w-full rounded-2xl py-4 shadow-lg shadow-sky-500/30 ${
-                isSaving ? "bg-sky-600/50" : "bg-sky-600"
-              }`}
+              className={`w-full rounded-2xl py-4 shadow-lg shadow-sky-500/30 ${isSaving ? "bg-sky-600/50" : "bg-sky-600"
+                }`}
             >
               <Text className="text-center text-base font-semibold uppercase tracking-wide text-white">
                 {isSaving ? "Guardando..." : "Guardar Área"}

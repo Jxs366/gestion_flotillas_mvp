@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function UserDetailScreen() {
   const { id } = useLocalSearchParams();
   const { getToken } = useAuth();
-  
+
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,12 +28,7 @@ export default function UserDetailScreen() {
     try {
       const token = await getToken();
       if (!token) return;
-
-      // Opción B: Usar URL directa si ya corregiste el .env (RECOMENDADO)
-      // const url = `${process.env.EXPO_PUBLIC_API_URL}/api/users/${id}`;
-      
-      // Opción temporal: Asegurando la URL correcta manualmente
-      const url = `${process.env.EXPO_PUBLIC_API_URL}/api/users/${id}`; 
+      const url = `${process.env.EXPO_PUBLIC_API_URL}/api/users/${id}`;
 
       const res = await fetch(url, {
         headers: {
@@ -123,10 +118,10 @@ export default function UserDetailScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 bg-gray-100">
-        
+
         {/* --- HEADER --- */}
         <View className="bg-white px-4 py-3 flex-row items-center shadow-sm border-b border-gray-200">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.back()}
             className="p-2 mr-2"
           >
@@ -136,7 +131,7 @@ export default function UserDetailScreen() {
         </View>
 
         <ScrollView className="flex-1 px-4 pt-4" contentContainerClassName="pb-10">
-          
+
           {/* --- TARJETA PRINCIPAL (PERFIL) --- */}
           <View className="bg-white p-6 rounded-xl mb-4 items-center shadow-sm">
             <View className="bg-gray-100 h-24 w-24 rounded-full items-center justify-center mb-3">
@@ -144,12 +139,12 @@ export default function UserDetailScreen() {
                 {user.full_name?.charAt(0) || "?"}
               </Text>
             </View>
-            
+
             <Text className="text-xl font-bold text-gray-800 text-center">
               {user.full_name}
             </Text>
             <Text className="text-gray-500 mb-3">{user.email}</Text>
-            
+
             {/* Badge de Rol */}
             <View className={`px-4 py-1 rounded-full ${isAdmin ? 'bg-purple-100' : 'bg-green-100'}`}>
               <Text className={`font-bold text-xs uppercase ${isAdmin ? 'text-purple-700' : 'text-green-700'}`}>
@@ -185,7 +180,7 @@ export default function UserDetailScreen() {
             <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border-l-4 border-orange-500">
               <View className="flex-row items-center mb-4 border-b border-gray-100 pb-2">
                 <View className="bg-orange-100 p-1.5 rounded-lg mr-2">
-                   <Ionicons name="car" size={20} color="#ff6600" />
+                  <Ionicons name="car" size={20} color="#ff6600" />
                 </View>
                 <Text className="text-gray-800 font-bold">Información de Conductor</Text>
               </View>
@@ -205,7 +200,7 @@ export default function UserDetailScreen() {
                   <Text className="text-xs text-gray-500 uppercase">Estado</Text>
                   <View className={`mt-1 px-3 py-1 rounded-full ${user.driver_status === 'active' ? 'bg-green-100' : 'bg-gray-200'}`}>
                     <Text className={`text-xs font-bold ${user.driver_status === 'active' ? 'text-green-700' : 'text-gray-600'}`}>
-                       {(user.driver_status || "inactivo").toUpperCase()}
+                      {(user.driver_status || "inactivo").toUpperCase()}
                     </Text>
                   </View>
                 </View>
@@ -214,7 +209,7 @@ export default function UserDetailScreen() {
               <View>
                 <Text className="text-xs text-gray-500 uppercase">Teléfono</Text>
                 <View className="flex-row items-center mt-1">
-                  <Ionicons name="call" size={16} color="#666" style={{marginRight: 6}} />
+                  <Ionicons name="call" size={16} color="#666" style={{ marginRight: 6 }} />
                   <Text className="text-base text-gray-800">
                     {user.phone || "No registrado"}
                   </Text>
@@ -223,29 +218,27 @@ export default function UserDetailScreen() {
             </View>
           )}
 
-          {/* Botones de Acción (Ejemplo) */}
+          {/* Botones de Acción*/}
           {!isAdmin && (
-             <TouchableOpacity 
-               onPress={handleSoftDelete}
-               className={`p-4 rounded-xl flex-row items-center justify-center border mt-2 mb-6 ${
-                 user.driver_status === 'inactive' 
-                 ? 'bg-white border-green-100' // Estilo para Reactivar
-                 : 'bg-white border-red-100'   // Estilo para Desactivar
-               }`}
-             >
-               <Ionicons 
-                 name={user.driver_status === 'inactive' ? "refresh-outline" : "ban-outline"} 
-                 size={20} 
-                 color={user.driver_status === 'inactive' ? "#10b981" : "#ff3b30"} 
-               />
-               <Text className={`font-bold ml-2 ${
-                 user.driver_status === 'inactive' ? "text-green-500" : "text-red-500"
-               }`}>
-                  {user.driver_status === 'inactive' ? 'Reactivar Conductor' : 'Desactivar Conductor'}
-               </Text>
-             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSoftDelete}
+              className={`p-4 rounded-xl flex-row items-center justify-center border mt-2 mb-6 ${user.driver_status === 'inactive'
+                ? 'bg-white border-green-100'
+                : 'bg-white border-red-100'
+                }`}
+            >
+              <Ionicons
+                name={user.driver_status === 'inactive' ? "refresh-outline" : "ban-outline"}
+                size={20}
+                color={user.driver_status === 'inactive' ? "#10b981" : "#ff3b30"}
+              />
+              <Text className={`font-bold ml-2 ${user.driver_status === 'inactive' ? "text-green-500" : "text-red-500"
+                }`}>
+                {user.driver_status === 'inactive' ? 'Reactivar Conductor' : 'Desactivar Conductor'}
+              </Text>
+            </TouchableOpacity>
           )}
-          
+
         </ScrollView>
       </View>
     </SafeAreaView>

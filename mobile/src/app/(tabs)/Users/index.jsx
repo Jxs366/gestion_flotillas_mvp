@@ -1,6 +1,6 @@
 import { useAuth } from "@clerk/clerk-expo";
-import { Link, useFocusEffect } from "expo-router"; // Importamos useFocusEffect
-import { useCallback, useState } from "react";      // Importamos useCallback
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -8,13 +8,13 @@ import {
   Text,
   TouchableOpacity,
   View,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-// Asegúrate de que la ruta a tu componente sea correcta
-import UserCard from "../../components/UserCard"; 
+import DashboardHeader from "../../components/DashboardHeader";
+import UserCard from "../../components/UserCard";
 
 export default function UsersScreen() {
   const [users, setUsers] = useState([]);
@@ -25,9 +25,8 @@ export default function UsersScreen() {
 
   async function loadUsers() {
     try {
-      // Si es la primera carga (isLoading true), no activamos el spinner de refresh manual
       if (!isLoading) setRefreshing(true);
-      
+
       const token = await getToken();
 
       if (!token) {
@@ -54,7 +53,7 @@ export default function UsersScreen() {
       const data = await res.json();
       setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("❌ Error al cargar usuarios:", error.message);
+      console.error("Error al cargar usuarios:", error.message);
       setUsers([]);
     } finally {
       setRefreshing(false);
@@ -62,56 +61,63 @@ export default function UsersScreen() {
     }
   }
 
-  // ✅ USAMOS useFocusEffect PARA RECARGAR AL VOLVER A LA PANTALLA
   useFocusEffect(
     useCallback(() => {
       loadUsers();
     }, [])
   );
 
-  /**
-   * HELPER DE ESTADO
-   * Lee el campo 'driver_status' que viene del LEFT JOIN en el backend.
-   */
   const getUserStatus = (u) => {
-    // 1. Si el campo existe (driver inactivo o activo explícito), úsalo.
     if (u.driver_status) return u.driver_status;
-    
-    // 2. Si viene null (Admin o driver viejo sin registro), asume activo.
-    return 'active';
+    return "active";
   };
 
-  // Filtramos las listas
-  const activeUsers = users.filter(u => getUserStatus(u) !== 'inactive');
-  const inactiveUsers = users.filter(u => getUserStatus(u) === 'inactive');
+  const activeUsers = users.filter((u) => getUserStatus(u) !== "inactive");
+  const inactiveUsers = users.filter((u) => getUserStatus(u) === "inactive");
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" />
 
-      <View className="flex-1 bg-gray-50">
+      {/* HEADER*/}
+      <DashboardHeader />
+
+      <View className="flex-1 bg-gray-100">
         <ScrollView
-          className="flex-1"
+          className="flex-1 px-4"
+          contentContainerClassName="pb-32"
           showsVerticalScrollIndicator={false}
-          contentContainerClassName="px-4 pb-32 pt-6"
           refreshControl={
             <RefreshControl
-              tintColor="#ff6600"
-              colors={["#ff6600"]}
               refreshing={refreshing}
               onRefresh={loadUsers}
+              tintColor="#ff6600"
+              colors={["#ff6600"]}
             />
           }
         >
-          {/* HEADER */}
-          <View className="mb-6 px-2">
-            <Text className="text-3xl font-bold text-gray-800">Usuarios</Text>
-            <Text className="mt-1 text-base text-gray-500">
-              Administra el acceso y roles de tu flota.
-            </Text>
+          {/*BUSCADOR*/}
+          <View className="mt-4 mb-4 gap-3">
+            <View className="bg-white flex-row items-center px-4 py-3 rounded-xl shadow-sm border border-gray-300">
+              <Ionicons name="search" size={22} color="#888" />
+              <Text className="ml-2 text-gray-500">Buscar usuario...</Text>
+            </View>
+
+            {/* FILTROS */}
+            <View className="flex-row justify-between">
+              <TouchableOpacity className="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-300">
+                <Text className="text-gray-700 font-medium">Estado ▼</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-300">
+                <Text className="text-gray-700 font-medium">Rol ▼</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-300">
+                <Text className="text-gray-700 font-medium">Ordenar ▼</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          {/* LOADING & EMPTY STATES */}
+          {/* LOADING / EMPTY */}
           {isLoading && users.length === 0 ? (
             <View className="py-24">
               <ActivityIndicator size="large" color="#ff6600" />
@@ -123,20 +129,18 @@ export default function UsersScreen() {
             </View>
           ) : (
             <View>
-              {/* 1. USUARIOS ACTIVOS */}
-              <View>
-                {activeUsers.map((u) => (
-                  <UserCard key={u.id} user={u} isInactive={false} />
-                ))}
-              </View>
+              {/* ACTIVOS */}
+              {activeUsers.map((u) => (
+                <UserCard key={u.id} user={u} isInactive={false} />
+              ))}
 
-              {/* 2. USUARIOS INACTIVOS */}
+              {/* INACTIVOS */}
               {inactiveUsers.length > 0 && (
                 <View className="mt-6">
                   <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-3 ml-2">
                     Inactivos ({inactiveUsers.length})
                   </Text>
-                  
+
                   {inactiveUsers.map((u) => (
                     <UserCard key={u.id} user={u} isInactive={true} />
                   ))}
@@ -146,7 +150,7 @@ export default function UsersScreen() {
           )}
         </ScrollView>
 
-        {/* FAB (Botón Agregar) */}
+        {/* BOTÓN FLOTANTE */}
         <Link href="/(tabs)/Users/register" asChild>
           <TouchableOpacity
             activeOpacity={0.8}
