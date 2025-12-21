@@ -60,7 +60,6 @@ frontend/pnpm-debug.log*
 # Env files
 .env
 *.env
-*.env.*
 
 # System files
 .DS_Store
